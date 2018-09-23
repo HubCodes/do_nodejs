@@ -35,17 +35,34 @@ const { Readable, Writable, Duplex, Transform } = require('stream');
   수 있습니다.
 `
 
-const readableStream = new Readable({
+const readable = new Readable({
   read(size) {
     this.push('I am node.js\n');
   },
 });
 
-readableStream.pipe(process.stdout);
+readable.pipe(process.stdout);
 
 ` 위 코드를 실행하는 순간, I am node.js 문장이 계속해서 출력될 것입니다. 
   read를 통해 계속 읽기 요청이 들어오고, push 연산이 진행되기 때문입니다.
   저런 방법 외에도, 데이터가 준비되면 readableStream.on() 메서드를 통
   해 처리할 이벤트 (대표적으로 data, end)에 대한 콜백을 설정할 수 있습
   니다.
+`
+const { Readable, Writable, Duplex, Transform } = require('stream');
+
+const writable = new Writable({
+  write(chunk, encoding, callback) {
+    console.log(Array.from(chunk).map(x => String.fromCharCode(x)).join(''));
+    callback();
+  }
+});
+
+writable.write('Hello, world!');
+
+` 위 코드는 쓰기 스트림을 생성하고 있습니다. 쓰기 스트림 생성자에 넘겨주는 객체
+  는 write 메서드를 구현하고 있어야 합니다. write 메서드는 chunk, encoding,
+  callback 세 개의 인수를 받는데, chunk 인수는 보통은 버퍼이고, encoding은 
+  인코딩 힌트이고, callback은 쓰기에 성공했다는 신호를 나타냅니다. 만약 실패했
+  다면, 에러를 서술하는 에러 객체와 함께 콜백을 호출하면 됩니다.
 `
